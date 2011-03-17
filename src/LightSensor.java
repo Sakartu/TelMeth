@@ -26,7 +26,7 @@ public class LightSensor implements Sensor {
 	}
 
 	@Override
-	public int getCount() {
+	public int getPeakCount() {
 		return count;
 	}
 
