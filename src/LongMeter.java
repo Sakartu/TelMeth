@@ -9,16 +9,18 @@ import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class LongMeter {
-	private static int MAX_RUNS = 10000;
+	private static int MAX_RUNS = 300;
+	private static int BASE_RUNS = 100;
 	private static int MAX_SENSOR_VALUE = 5;
 	private Vector<Sensor> sensors;
 	private int nrSensors;
-	JTextField readout = new JTextField();
+	JLabel readout = new JLabel();
 	Button startButton = new Button("Start");
-	Button stopButton = new Button("Stop");
+	Button stopButton = new Button("Calc Volume");
 
 	public LongMeter() {
 		sensors = new Vector<Sensor>();
@@ -32,21 +34,33 @@ public class LongMeter {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				startButton.setEnabled(false);
+				stopButton.setEnabled(false);
+				System.out.println("Starting measurement");
 				s.startMeasuring();
+				blow();
+				
 			}
-			
+
 		});
 		stopButton.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				stopButton.setEnabled(false);
+				System.out.println("Calculating Volume...");
 				s.stopMeasuring();
 			}
-			
+
 		});		
 	}
 
 	private void setSensorValue(int s, int value) {
+		try{
+			Thread.sleep(1); //for some reason, java messes up if we don't stall it a bit 
+		} catch(Exception e){
+
+		}
 		sensors.get(s).setValue(value);
 	}
 
@@ -66,8 +80,8 @@ public class LongMeter {
 		gbc.ipady = 30;
 		gbc.gridwidth = 2;
 
+		readout.setOpaque(true);
 		readout.setText("0");
-		readout.setEditable(false);
 		readout.setForeground(Color.GREEN);
 		readout.setBackground(Color.BLACK);
 		readout.setHorizontalAlignment(JTextField.CENTER);
@@ -81,6 +95,7 @@ public class LongMeter {
 		gbc.gridy = 1;
 		panel.add(startButton, gbc);
 		gbc.gridx = 1;
+		stopButton.setEnabled(false);
 		panel.add(stopButton, gbc);
 		panel.setVisible(true);
 
@@ -88,13 +103,17 @@ public class LongMeter {
 		frame.setVisible(true);
 	}
 
-	public JTextField getReadout(){
+	public JLabel getReadout(){
 		return readout;
 	}
-	
+
 	public void run() {
 		initGUI();
-		int runs = 3000 + (int) (Math.random() * MAX_RUNS); //add some random breath length
+	}
+
+	private void blow() {
+		int runs = BASE_RUNS + (int) (Math.random() * (MAX_RUNS - BASE_RUNS)); //add some random breath length
+		System.out.println("Doing " + runs + " runs.");
 		int currentRun = 0;
 		while (currentRun < runs) {
 			setSensorValue(0, 0);
@@ -119,13 +138,8 @@ public class LongMeter {
 			setSensorValue(0, (int) (Math.random() * MAX_SENSOR_VALUE));
 			currentRun++;
 		}
-		// System.out.println("");
-		// System.out.println(currentRun);
-	}
-
-	public static void main(String[] args) {
-		LongMeter lm = new LongMeter();
-		lm.initGUI();
-	}
-
+		System.out.println("Done");
+		stopButton.setEnabled(true);
+		startButton.setEnabled(true);
+	}	
 }

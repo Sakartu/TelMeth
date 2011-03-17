@@ -1,12 +1,12 @@
-import javax.swing.JTextField;
+import javax.swing.JLabel;
 
 public interface Sensor {
 
 	public void setValue(int v);
 	public void stateChanged (Sensor s, int oldValue, int newValue);
 	public int getCount();
-	public int getVolume();
+	public double getVolume();
 	public void startMeasuring();
 	public void stopMeasuring();
-	public void setReadout(JTextField f);
+	public void setReadout(JLabel f);
 }

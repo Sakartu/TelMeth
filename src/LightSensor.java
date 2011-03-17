@@ -1,29 +1,28 @@
-import javax.swing.JTextField;
+import java.text.DecimalFormat;
+
+import javax.swing.JLabel;
 
 
 public class LightSensor implements Sensor {
 	private int value = 0;
 	private int count = 0;
 	private boolean measuring = false;
-	private JTextField readout;
+	private JLabel readout;
 	private static final int DIFF = 4;
-	private static final int VOL_PER_COUNT = 3;
-	
-	
+	private static final double VOL_PER_COUNT = 0.2;
+
+
 	public void stateChanged(Sensor s, int oldValue, int newValue) {
 		if(Math.abs(newValue - oldValue) > DIFF && measuring){
 			count++;
-			this.readout.setText("" + count);
+			showText("Turns: " + count);
 		}
 	}
-	
+
 	public void setValue(int v) {
-		int oldV;
-		if (v != this.value) {
-			oldV = this.value;
-			this.value = v;
-			stateChanged(this, oldV, this.value);
-		}
+		int oldV = this.value;
+		this.value = v;
+		stateChanged(this, oldV, this.value);
 	}
 
 	@Override
@@ -33,23 +32,37 @@ public class LightSensor implements Sensor {
 
 	@Override
 	public void startMeasuring() {
+		this.count = 0;
+		showText("Turns: 0");
 		this.measuring = true;
-		System.out.println("Start Pressed");
 	}
 
 	@Override
 	public void stopMeasuring() {
 		this.measuring = false;
-		this.readout.setText("Vol: " + getVolume() + "l");
+		showText("Vol: " + roundTwoDec(getVolume()) + "l");
+		this.count = 0;
 	}
-	
+
 	@Override
-	public int getVolume(){
+	public double getVolume(){
 		return count * VOL_PER_COUNT;
 	}
 
 	@Override
-	public void setReadout(JTextField readout) {
+	public void setReadout(JLabel readout) {
 		this.readout = readout;
 	}
+
+	private void showText(String line){
+		this.readout.setText(line);
+		this.readout.paintImmediately(this.readout.getVisibleRect());		
+	}
+
+	private double roundTwoDec(double in){
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		return Double.valueOf(twoDForm.format(in));
+
+	}
+
 }
